@@ -9,7 +9,7 @@ import javax.inject.Inject
 class MatchesRepoImpl @Inject constructor(private val service: ApiService) :
     BaseRemoteDataSource() {
 
-    suspend fun getMatchList(): Result<MatchListResponse> {
-        return getResult { service.getMatchList() }
+    suspend fun getMatchList(from: String, to: String): Result<MatchListResponse> {
+        return getResult { service.getMatchList(from, to) }
     }
 }

@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.WindowManager
 import android.widget.LinearLayout
+import org.carefer.football.ui.home.data.model.Team
+import org.carefer.football.ui.home.data.model.TeamModel
 
 fun Dialog.setDefaultWindowTheme() {
     window?.apply {
@@ -17,4 +19,11 @@ fun Dialog.setDefaultWindowTheme() {
         statusBarColor = Color.TRANSPARENT
         setDimAmount(0.3f)
     }
+
+
+}
+
+fun Team.mapTeamToUiModel(): TeamModel {
+
+    return TeamModel(this.id!!, this.name!!, this.crest?:"")
 }
