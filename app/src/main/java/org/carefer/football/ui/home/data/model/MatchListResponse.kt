@@ -9,7 +9,7 @@ data class MatchListResponse(
     @SerialName("filters")
     val filters: Filters?,
     @SerialName("matches")
-    val matches: List<Matche>?,
+    val matches: List<Matche?>?,
     @SerialName("resultSet")
     val resultSet: ResultSet?
 )
@@ -29,13 +29,13 @@ data class Matche(
     @SerialName("area")
     val area: Area?,
     @SerialName("awayTeam")
-    val awayTeam: AwayTeam?,
+    val awayTeam: Team?,
     @SerialName("competition")
     val competition: Competition?,
     @SerialName("group")
     val group: Any?,
     @SerialName("homeTeam")
-    val homeTeam: HomeTeam?,
+    val homeTeam: Team?,
     @SerialName("id")
     val id: Int?,
     @SerialName("lastUpdated")
@@ -45,7 +45,7 @@ data class Matche(
     @SerialName("odds")
     val odds: Odds?,
     @SerialName("referees")
-    val referees: List<Any?>?,
+    val referees: List<Referee?>?,
     @SerialName("score")
     val score: Score?,
     @SerialName("season")
@@ -85,7 +85,7 @@ data class Area(
 )
 
 @Serializable
-data class AwayTeam(
+data class Team(
     @SerialName("crest")
     val crest: String?,
     @SerialName("id")
@@ -112,24 +112,23 @@ data class Competition(
     val type: String?
 )
 
-@Serializable
-data class HomeTeam(
-    @SerialName("crest")
-    val crest: String?,
-    @SerialName("id")
-    val id: Int?,
-    @SerialName("name")
-    val name: String?,
-    @SerialName("shortName")
-    val shortName: String?,
-    @SerialName("tla")
-    val tla: String?
-)
 
 @Serializable
 data class Odds(
     @SerialName("msg")
     val msg: String?
+)
+
+@Serializable
+data class Referee(
+    @SerialName("id")
+    val id: Int?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("nationality")
+    val nationality: String?,
+    @SerialName("type")
+    val type: String?
 )
 
 @Serializable
@@ -141,7 +140,7 @@ data class Score(
     @SerialName("halfTime")
     val halfTime: HalfTime?,
     @SerialName("winner")
-    val winner: Any?
+    val winner: String?
 )
 
 @Serializable
@@ -161,15 +160,15 @@ data class Season(
 @Serializable
 data class FullTime(
     @SerialName("away")
-    val away: Any?,
+    val away: Int?,
     @SerialName("home")
-    val home: Any?
+    val home: Int?
 )
 
 @Serializable
 data class HalfTime(
     @SerialName("away")
-    val away: Any?,
+    val away: Int?,
     @SerialName("home")
-    val home: Any?
+    val home: Int?
 )

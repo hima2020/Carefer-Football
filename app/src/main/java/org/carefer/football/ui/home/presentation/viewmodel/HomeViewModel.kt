@@ -20,11 +20,12 @@ class HomeViewModel @Inject constructor(private val matchRepository: MatchesRepo
 
     private val _resultResponse = MutableLiveData<Result<MatchListResponse>>()
     val resultResponse: LiveData<Result<MatchListResponse>> = _resultResponse
-    suspend fun getMatchList() {
+    suspend fun getMatchList(dateArgs: Pair<String, String>) {
 
         _res.postValue(null)
         _resultResponse.postValue(Result.loading(null))
-        val res = matchRepository.getMatchList()
+        val res = matchRepository.getMatchList(dateArgs.first, dateArgs.second)
+
         _resultResponse.postValue(res)
 
     }
