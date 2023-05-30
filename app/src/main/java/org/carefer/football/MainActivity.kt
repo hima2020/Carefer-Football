@@ -1,11 +1,16 @@
 package org.carefer.football
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
+import org.carefer.football.base.BaseActivity
 
-class MainActivity : AppCompatActivity() {
+
+@AndroidEntryPoint
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
     }
 }
