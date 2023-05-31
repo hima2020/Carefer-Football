@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import org.carefer.football.R
 import org.carefer.football.databinding.ItemMatchBinding
-import org.carefer.football.ui.home.data.model.Matche
+import org.carefer.football.ui.home.data.model.MatchModel
 import org.carefer.football.views.extentions.getTextColor
-import org.carefer.football.views.extentions.getTime
 
 class MatchListAdapter(private val mList: ArrayList<Any>) :
     RecyclerView.Adapter<MatchListAdapter.ViewHolder>() {
 
-    var onItemClick: ((Matche) -> Unit)? = null
+    var onItemClick: ((MatchModel) -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
         val binding = ItemMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -37,11 +37,11 @@ class MatchListAdapter(private val mList: ArrayList<Any>) :
     inner class ViewHolder(private val itemBinding: ItemMatchBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
         fun bind(item: Any) {
-            if (item is Matche) {
+            if (item is MatchModel) {
                 itemBinding?.cvMatch?.visibility = View.VISIBLE
                 //  itemBinding?.tvDate?.visibility = View.GONE
-                itemBinding?.tvAwayTeam?.text = item.awayTeam?.name
-                itemBinding?.tvHomeTeam?.text = item.homeTeam?.name
+                itemBinding?.tvAwayTeam?.text = item.awayTeamName
+                itemBinding?.tvHomeTeam?.text = item.homeTeamName
 //                itemBinding?.tvScoreTeamAway?.text = "${item.score?.fullTime?.away ?: "-"}"
 //                itemBinding?.tvScoreTeamHome?.text = "${item.score?.fullTime?.home ?: "-"}"
                 // itemBinding?.tvMatchDate?.text = item.utcDate?.getDate()
@@ -53,34 +53,54 @@ class MatchListAdapter(private val mList: ArrayList<Any>) :
                         item.status?.getTextColor()!!
                     )
                 )
-                if (item.status.equals("TIMED")) {
-                    itemBinding?.tvMatchTime?.text = item.utcDate?.getTime()
+                if (item?.homeTeamScore == null) {
+                    itemBinding?.tvScoreTeamHome?.text = "-"
                 } else {
-                    itemBinding?.tvMatchTime?.text = item.status?.trim()
+                    itemBinding?.tvScoreTeamHome?.text = item.homeTeamScore.toString()
                 }
-
-//                Glide.with(itemView.context).load(item.awayTeam?.crest)
-//                    .placeholder(R.drawable.ic_launcher_foreground).into(itemBinding.ivAwayFlag)
-//                Glide.with(itemView.context).load(item.homeTeam?.crest)
-//                    .placeholder(R.drawable.ic_launcher_foreground).into(itemBinding.ivHomeFlag)
-
-
-                itemBinding?.root.setOnClickListener {
-                    onItemClick?.invoke(item)
+                if (item?.awayTeamScore == null) {
+                    itemBinding?.tvScoreTeamAway?.text = "-"
+                } else {
+                    itemBinding?.tvScoreTeamAway?.text = item.awayTeamScore.toString()
                 }
+                itemBinding?.tvStatus?.text = item.status
+
+
+                itemBinding?.tvMatchTime?.text = item.shortTime
+
+
+                Glide.with(itemBinding.root.context)
+                    .load(R.drawable.ic_favorites_active)
+                    .placeholder(
+                        ContextCompat.getDrawable(
+                            itemBinding.root.context,
+                            R.drawable.ic_launcher_foreground
+                        )
+                    )
+                    .into(itemBinding.ivFav)
+
+                Glide.with(itemView.context).load(item.awayTeamFlag)
+                    .placeholder(R.drawable.ic_launcher_foreground).into(itemBinding.ivAwayFlag)
+                Glide.with(itemView.context).load(item.homeTeamFlag)
+                    .placeholder(R.drawable.ic_launcher_foreground).into(itemBinding.ivHomeFlag)
+
+
             }
-            if (item is String) {
-                itemBinding?.cvMatch?.visibility = View.GONE
-                //  itemBinding?.tvDate?.visibility = View.VISIBLE
-                //  itemBinding.tvDate?.text = item
 
+
+            itemBinding?.ivFav?.setOnClickListener {
+
+                onItemClick?.invoke(item as MatchModel)
+                notifyItemChanged(position)
             }
 
 
         }
     }
 
+
     fun addMatches(matches: List<Any>) {
+        mList.clear()
         mList.addAll(matches)
         notifyDataSetChanged()
     }

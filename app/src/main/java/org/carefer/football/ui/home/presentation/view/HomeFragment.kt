@@ -32,8 +32,8 @@ import org.carefer.football.ui.home.presentation.viewmodel.HomeViewModel
 import org.carefer.football.utils.Utils
 import org.carefer.football.views.EndlessScrollListener
 import org.carefer.football.views.extentions.getDate
-import org.carefer.football.views.extentions.mapTeamToUiModel
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
@@ -41,6 +41,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     var adapter: MatchListAdapter? = null
     private lateinit var _binding: FragmentHomeBinding
     private val binding get() = _binding
+    private val lstFav :ArrayList<Int> = ArrayList()
 
     private val viewModel: HomeViewModel by activityViewModels<HomeViewModel>()
     private var loadToTop = false
@@ -51,7 +52,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val itemAdapter = ModelAdapter { item: ItemModel ->
         when (item) {
-            is MatchModel -> MatchItem(item, requireContext())
+            is MatchModel -> {
+
+                MatchItem(item, requireContext(), {
+                    viewModel.addToFav(it)
+
+                }, {
+                    lstFav.contains(it)
+
+                })
+            }
             is DateModel -> DateItem(item)
             else -> throw IllegalArgumentException()
         }
@@ -67,21 +77,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        initViews()
         init(activity?.application)
 
         setupRecyclerView()
         initObservation()
 
         getMatchList(Utils.getDates(Date(), true))
+        getFavs()
 
         return binding.root
 
     }
 
-    private fun initViews() {
-        adapter = MatchListAdapter(ArrayList())
-        binding?.rvMatchList?.adapter = adapter
+    private fun getFavs() {
+        lifecycleScope.launch(Dispatchers.IO){
+            viewModel.getAllMatches()
+        }
     }
 
 
@@ -115,6 +126,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private fun initObservation() {
 
 
+        viewModel.favorites.observe(viewLifecycleOwner){
+            if (it!=null){
+                lstFav.clear()
+                lstFav.addAll( it.map { it.id })
+
+
+            }
+        }
         viewModel.resultResponse.observe(viewLifecycleOwner) { result ->
             when (result.status) {
                 Result.Status.SUCCESS -> {
@@ -127,15 +146,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             listOf(
                                 //change api model to ui model
                                 MatchModel(
-                                    it?.homeTeam?.mapTeamToUiModel()!!,
+                                    it?.id!!,
+                                    it?.homeTeam?.name!!,
+                                    it?.homeTeam?.crest ?: "",
                                     it?.score?.fullTime?.home,
-                                    it.awayTeam?.mapTeamToUiModel()!!,
+                                    it.awayTeam?.name!!,
+                                    it.awayTeam?.crest!!,
                                     it.score?.fullTime?.away,
                                     it.utcDate!!,
                                     it.status!!,
                                     it.matchday.toString(),
-                                    it.homeTeam?.crest,
-                                    it.awayTeam?.crest
                                 )
                             )
 
@@ -216,9 +236,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         } else {
             footerAdapter.clear()
             itemAdapter.add(items)
+
         }
 
+
     }
+
 
     private fun getMatchList(dateArgs: Pair<String, String>) {
         lifecycleScope.launch {

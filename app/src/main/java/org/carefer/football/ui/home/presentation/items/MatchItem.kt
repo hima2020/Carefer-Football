@@ -13,7 +13,10 @@ import org.carefer.football.ui.home.data.model.MatchModel
 
 class MatchItem(
     private val match: MatchModel,
-    private val context: Context
+    private val context: Context,
+    private val onItemClick: ((MatchModel) -> Unit)?,
+    private val isItemFav: ((Int) -> Boolean)?
+
 ) : ModelAbstractItem<MatchModel, MatchItem.MatchViewHolder>(match) {
 
     var isFlagLoaded = false
@@ -35,6 +38,29 @@ class MatchItem(
             holder.lytMatchSchedule.visibility = View.GONE
         }
 
+        if (isItemFav?.invoke(match.id) == true) {
+            Glide.with(context)
+                .load(R.drawable.ic_favorites_active)
+                .placeholder(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_launcher_foreground
+                    )
+                )
+                .into(holder.ivFav)
+        } else {
+
+            Glide.with(context)
+                .load(R.drawable.ic_favorites_grey)
+                .placeholder(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_launcher_foreground
+                    )
+                )
+                .into(holder.ivFav)
+        }
+
 //        if (!isFlagLoaded)
 //            onTeamInfo.getTeamsFlag(match.homeTeam.id, match.awayTeam.id, object : OnResult {
 //                override fun onSuccess() {
@@ -43,17 +69,22 @@ class MatchItem(
 //            })
 
         Glide.with(context)
-            .load(match.homeTeam.teamFlag)
+            .load(match.homeTeamFlag)
             .placeholder(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
             .into(holder.ivHomeTeam)
         Glide.with(context)
-            .load(match.awayTeam.teamFlag)
+            .load(match.awayTeamFlag)
             .placeholder(ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground))
             .into(holder.ivAwayTeam)
 
-        holder.tvHomeTeam.text = match.homeTeam.name
+
+
+
+
+        holder.tvHomeTeam.text = match.homeTeamName
+        holder.tvHomeTeam.text = match.homeTeamName
         holder.lytMatchSchedule.text = match.shortTime
-        holder.tvAwayTeam.text = match.awayTeam.name
+        holder.tvAwayTeam.text = match.awayTeamName
         holder.tvMatchStatus.text = match.status.toLowerCase()
         if (match.homeTeamScore != null) {
             holder.tvHomeTeamScore.text = match.homeTeamScore.toString()
@@ -64,6 +95,31 @@ class MatchItem(
             holder.tvAwayTeamScore.text = match.awayTeamScore.toString()
         } else {
             holder.tvAwayTeamScore.text = "-"
+        }
+        holder.ivFav.setOnClickListener {
+            if (isItemFav?.invoke(match.id)!!){
+                Glide.with(context)
+                    .load(R.drawable.ic_favorites_grey)
+                    .placeholder(
+                        ContextCompat.getDrawable(
+                            context,
+                            R.drawable.ic_launcher_foreground
+                        )
+                    )
+                    .into(holder.ivFav)
+            }
+            else{
+                Glide.with(context)
+                    .load(R.drawable.ic_favorites_active)
+                    .placeholder(
+                        ContextCompat.getDrawable(
+                            context,
+                            R.drawable.ic_launcher_foreground
+                        )
+                    )
+                    .into(holder.ivFav)
+            }
+            onItemClick?.invoke(match)
         }
 
     }
@@ -91,6 +147,7 @@ class MatchItem(
         var tvMatchStatus: TextView = view.findViewById(R.id.tv_status)
         var ivHomeTeam: ImageView = view.findViewById(R.id.iv_home_flag)
         var ivAwayTeam: ImageView = view.findViewById(R.id.iv_away_flag)
+        var ivFav: ImageView = view.findViewById(R.id.iv_fav)
 
     }
 }
