@@ -4,9 +4,10 @@ import org.carefer.football.utils.Utils
 import org.threeten.bp.LocalDate
 import java.util.*
 
+
 open class ItemModel(
     var utcDate: String,
-    var competition: Competition?
+    var competition: String?
 ) {
     constructor(utcDate: String) : this(utcDate, null)
 
